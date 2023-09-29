@@ -1,7 +1,16 @@
 package com.hemu.hindinewslivetv;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.app.Dialog;
+import android.content.BroadcastReceiver;
+import android.content.IntentFilter;
+import android.net.ConnectivityManager;
+import android.os.Bundle;
+
+
+import androidx.annotation.NonNull;
+
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.content.Context;
@@ -18,6 +27,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -34,16 +44,30 @@ import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
 import com.hemu.hindinewslivetv.models.Channel;
+import com.hemu.hindinewslivetv.models.Common;
+import com.hemu.hindinewslivetv.services.YoutubeDataService;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.Objects;
+
 
 public class StreamActivity extends AppCompatActivity {
     PlayerView playerView;
+    public static final String TAG = "TAG";
     ImageView fbLink, youtubeLink, webLink, fullScreen;
     TextView Description;
     boolean isFullScreen = false;
     ExoPlayer player;
     ProgressBar progressBar,progressBar2;
-    private AdView adView,adView1,adView2;
+    private AdView adView1,adView2;
+    LinearLayout linearLayout;
+    NetworkChangeListener networkChangeListener = new NetworkChangeListener();
     WebView web;
+    YoutubeDataService service;
+    String title,youtubeID;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,10 +75,13 @@ public class StreamActivity extends AppCompatActivity {
         setContentView(R.layout.activity_stream);
 
         Channel channel = (Channel) getIntent().getSerializableExtra("channel");
-        getSupportActionBar().setTitle(channel.getName());
+        assert channel != null;
+        Objects.requireNonNull(getSupportActionBar()).setTitle(channel.getName());
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         loadAds();
+        title = channel.getName();
+        youtubeID = channel.getYoutube();
 
         playerView = findViewById(R.id.playerView);
         fullScreen = playerView.findViewById(R.id.exo_fullscreen_icon);
@@ -73,10 +100,41 @@ public class StreamActivity extends AppCompatActivity {
                     setFullScreen("exo");
                 }
             });
-        }else if(category.equals("yt")) {
+        }else if(category.equals("api")) {
             playerView.setVisibility(View.GONE);
             progressBar.setVisibility(View.GONE);
             playChannel("");
+
+            service = new YoutubeDataService(this);
+
+            String apiUrl = "https://www.googleapis.com/youtube/v3/search?part=snippet&channelId="+channel.getYoutube()+"&eventType=live&maxResults=1&order=date&type=video&key="+channel.getLive_url();
+
+            service.getYoutubeData(apiUrl, new YoutubeDataService.OnDataResponse() {
+                @Override
+                public Void onError(String error) {
+                    startActivity(new Intent(StreamActivity.this, WebActivity.class).putExtra("title",channel.getName()).putExtra("url","https://www.youtube.com/channel/"+channel.getYoutube()+"/live"));
+                    return null;
+                }
+                @Override
+                public void onResponse(JSONObject response) {
+                    try {
+                        JSONArray jsonArray = response.getJSONArray("items");
+                        JSONObject jsonObject = jsonArray.getJSONObject(0);
+                        if (!jsonObject.getString("id").isEmpty()){
+                            JSONObject jsonObject1 = new JSONObject(jsonObject.getString("id"));
+                            web.loadUrl("https://www.youtube.com/embed/"+jsonObject1.getString("videoId"));
+                        }else {
+                            startActivity(new Intent(StreamActivity.this, WebActivity.class).putExtra("title",channel.getName()).putExtra("url","https://www.youtube.com/channel/"+channel.getYoutube()+"/live"));
+                            finish();
+                        }
+
+                    } catch (JSONException e) {
+                        startActivity(new Intent(StreamActivity.this, WebActivity.class).putExtra("title",channel.getName()).putExtra("url","https://www.youtube.com/channel/"+channel.getYoutube()+"/live"));
+                        finish();
+                    }
+
+                }
+            });
 
             web.getSettings().setJavaScriptEnabled(true);
             web.getSettings().setLoadWithOverviewMode(true);
@@ -105,6 +163,7 @@ public class StreamActivity extends AppCompatActivity {
                             "head.appendChild(css);" +
                             "document.querySelector('.ytp-play-button').click();" +
                             "css.type = 'text/css';"+
+                            "if(document.querySelector('.ytp-error-content-wrap-reason')){Android.showToast(`error`);}else{Android.showToast(`noError`);}"+
                             "let ytpFullscreenButton = document.querySelector('.ytp-fullscreen-button');" +
                             "ytpFullscreenButton.addEventListener('click', function() { Android.showToast(`toast`); });";
 
@@ -118,35 +177,19 @@ public class StreamActivity extends AppCompatActivity {
                 }
             });
 
-            web.loadUrl(channel.getLive_url());
-
             web.addJavascriptInterface(new WebAppInterface(this), "Android");
         }
 
 
         fbLink = findViewById(R.id.fbLink);
-        fbLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openLink(channel.getFacebook());
-            }
-        });
+
+        fbLink.setOnClickListener(v -> openLink("https://www.facebook.com/"+channel.getFacebook()));
 
         youtubeLink = findViewById(R.id.youtubeLink);
-        youtubeLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openLink(channel.getYoutube());
-            }
-        });
+        youtubeLink.setOnClickListener(v -> openLink("https://www.youtube.com/channel/"+ channel.getYoutube()));
 
         webLink = findViewById(R.id.webLink);
-        webLink.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                openLink(channel.getWebsite());
-            }
-        });
+        webLink.setOnClickListener(v -> openLink(channel.getWebsite()));
 
         Description = findViewById(R.id.channelDes);
         Description.setText(channel.getDescription());
@@ -156,41 +199,48 @@ public class StreamActivity extends AppCompatActivity {
 
     public void setFullScreen(String button){
         if (isFullScreen){
-            getSupportActionBar().hide();
+
+            if(adView1!=null){
+                adView1.setVisibility(View.VISIBLE);
+            }
+            if(adView2!=null){
+                adView2.setVisibility(View.VISIBLE);
+            }
+
             getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_FULLSCREEN);
             if (getSupportActionBar() != null){
                 getSupportActionBar().show();
             }
             setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) playerView.getLayoutParams();
-            params.width = params.MATCH_PARENT;
-            params.height = (int) (200 * getApplicationContext().getResources().getDisplayMetrics().density);
             if(button.equals("yt")){
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) web.getLayoutParams();
+                params.width = params.MATCH_PARENT;
+                params.height = (int) (200 * getApplicationContext().getResources().getDisplayMetrics().density);
                 web.setLayoutParams(params);
             }else {
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) playerView.getLayoutParams();
+                params.width = params.MATCH_PARENT;
+                params.height = (int) (200 * getApplicationContext().getResources().getDisplayMetrics().density);
+
                 playerView.setLayoutParams(params);
             }
             isFullScreen = false;
         }else {
-            if (adView != null) {
-                adView.setVisibility(View.GONE);
-                adView.destroy();
-            }
-            if (adView2 != null) {
-                adView2.setVisibility(View.GONE);
-                adView2.destroy();
-            }
-            if (adView1 != null) {
+            if(adView1!=null){
                 adView1.setVisibility(View.GONE);
-                adView1.destroy();
             }
-            ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) playerView.getLayoutParams();
-            params.width = params.MATCH_PARENT;
-            params.height = params.MATCH_PARENT;
-
+            if(adView2!=null){
+                adView2.setVisibility(View.GONE);
+            }
             if(button.equals("yt")){
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) web.getLayoutParams();
+                params.width = params.MATCH_PARENT;
+                params.height = params.MATCH_PARENT;
                 web.setLayoutParams(params);
             }else {
+                ConstraintLayout.LayoutParams params = (ConstraintLayout.LayoutParams) playerView.getLayoutParams();
+                params.width = params.MATCH_PARENT;
+                params.height = params.MATCH_PARENT;
                 playerView.setLayoutParams(params);
             }
 
@@ -215,14 +265,37 @@ public class StreamActivity extends AppCompatActivity {
             mContext = c;
         }
 
-        @JavascriptInterface   // must be added for API 17 or higher
+        @JavascriptInterface
         public void showToast(String toast) {
-            StreamActivity.this.runOnUiThread(new Runnable() {
-                @Override
-                public void run() {
-                    setFullScreen("yt");
-                }
-            });
+
+            if (toast.equals("toast")){
+                StreamActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        setFullScreen("yt");
+                    }
+                });
+            }
+
+            if (toast.equals("noError")){
+                StreamActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        web.setVisibility(View.VISIBLE);
+                    }
+                });
+            }
+
+
+            if (toast.equals("error")){
+                StreamActivity.this.runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        startActivity(new Intent(StreamActivity.this, WebActivity.class).putExtra("title", title).putExtra("url","https://www.youtube.com/channel/"+youtubeID+"/live"));
+                    }
+                });
+            }
+
         }
     }
 
@@ -294,19 +367,40 @@ public class StreamActivity extends AppCompatActivity {
             }
         });
         int o = getResources().getConfiguration().orientation;
-        adView = findViewById(R.id.adView);
         adView1 = findViewById(R.id.adView1);
         adView2 = findViewById(R.id.adView2);
         AdRequest adRequest = new AdRequest.Builder().build();
 
         if (o != Configuration.ORIENTATION_LANDSCAPE){
-            adView.loadAd(adRequest);
             adView1.loadAd(adRequest);
             adView2.loadAd(adRequest);
         }else {
 
         }
+    }
+    public class NetworkChangeListener extends BroadcastReceiver {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            if (!Common.isConnectToInternet(context)) {
+                final Dialog dialog = new Dialog(context); // Context, this, etc.
+                dialog.setContentView(R.layout.activity_network);
+                linearLayout = dialog.findViewById(R.id.dismiss);
+                linearLayout.setOnClickListener(v -> dialog.cancel());
+                dialog.show();
+            }
+        }
+    }
 
+    @Override
+    protected void onStart() {
+        IntentFilter filter = new IntentFilter(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(networkChangeListener, filter);
+        super.onStart();
+    }
 
+    @Override
+    protected void onStop() {
+        unregisterReceiver(networkChangeListener);
+        super.onStop();
     }
 }

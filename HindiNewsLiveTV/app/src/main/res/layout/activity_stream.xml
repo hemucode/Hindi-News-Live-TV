@@ -19,6 +19,7 @@
 
     <WebView
         android:id="@+id/webView"
+        android:visibility="invisible"
         android:layout_width="match_parent"
         android:layout_height="200dp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -135,33 +136,17 @@
 
 
     <com.google.android.gms.ads.AdView
-        android:id="@+id/adView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:layout_marginTop="15dp"
-        app:adSize="BANNER"
-        app:adUnitId="@string/Banner_Ads_1"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/channelDes">
-    </com.google.android.gms.ads.AdView>
-
-    <com.google.android.gms.ads.AdView
         android:id="@+id/adView1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="5dp"
         android:layout_marginBottom="5dp"
         app:adSize="MEDIUM_RECTANGLE"
         app:adUnitId="@string/Banner_Ads_1"
         app:layout_constraintBottom_toTopOf="@+id/adView2"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/adView">
+        app:layout_constraintStart_toStartOf="parent">
 
     </com.google.android.gms.ads.AdView>
 

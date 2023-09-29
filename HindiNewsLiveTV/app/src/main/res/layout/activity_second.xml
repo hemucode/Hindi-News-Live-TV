@@ -28,11 +28,13 @@
                     android:layout_height="wrap_content"
                     android:layout_alignParentBottom="true"
                     android:layout_centerHorizontal="true"
-                    app:adSize="MEDIUM_RECTANGLE"
+                    android:layout_marginTop="10dp"
+                    app:adSize="BANNER"
                     app:adUnitId="@string/Banner_Ads_1"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="parent"></com.google.android.gms.ads.AdView>
+                    app:layout_constraintTop_toTopOf="parent">
+                </com.google.android.gms.ads.AdView>
 
                 <androidx.cardview.widget.CardView
                     android:id="@+id/cardVide"
@@ -74,14 +76,13 @@
                         android:layout_height="match_parent">
 
                         <GridLayout
+                            android:id="@+id/gridLayout"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_margin="10dp"
                             android:layout_marginTop="10dp"
-                            android:layout_marginBottom="10dp"
                             android:columnCount="2"
                             android:rowCount="2"
-                            app:layout_constraintBottom_toBottomOf="parent"
                             app:layout_constraintEnd_toEndOf="parent"
                             app:layout_constraintStart_toStartOf="parent"
                             app:layout_constraintTop_toTopOf="parent">
@@ -167,7 +168,7 @@
 
 
                             <androidx.cardview.widget.CardView
-                                android:id="@+id/CardView3"
+                                android:id="@+id/CardView32"
                                 android:layout_width="150dp"
                                 android:layout_height="150dp"
                                 android:layout_margin="10dp"
@@ -183,13 +184,13 @@
                                         android:layout_width="match_parent"
                                         android:layout_height="60dp"
                                         android:layout_marginTop="5dp"
-                                        app:srcCompat="@drawable/policy" />
+                                        app:srcCompat="@drawable/shorts" />
 
                                     <TextView
                                         android:layout_width="match_parent"
                                         android:layout_height="wrap_content"
                                         android:gravity="center"
-                                        android:text="@string/privacy_policy"
+                                        android:text="@string/shorts"
                                         android:textColor="@color/txt_color"
                                         android:textSize="18sp"
                                         android:textStyle="bold" />
@@ -199,7 +200,46 @@
                                         android:layout_height="wrap_content"
                                         android:layout_marginTop="5dp"
                                         android:gravity="center"
-                                        android:text="@string/app_policy_bn" />
+                                        android:text="@string/hi_shorts" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/CardView33"
+                                android:layout_width="150dp"
+                                android:layout_height="150dp"
+                                android:layout_margin="10dp"
+                                app:cardCornerRadius="10dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:padding="10dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="60dp"
+                                        android:layout_marginTop="5dp"
+                                        app:srcCompat="@drawable/election" />
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:text="@string/election_result"
+                                        android:textColor="@color/txt_color"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        android:gravity="center"
+                                        android:text="@string/election_ml" />
 
                                 </LinearLayout>
 
@@ -244,6 +284,45 @@
 
                             </androidx.cardview.widget.CardView>
 
+                            <androidx.cardview.widget.CardView
+                                android:id="@+id/CardView3"
+                                android:layout_width="150dp"
+                                android:layout_height="150dp"
+                                android:layout_margin="10dp"
+                                app:cardCornerRadius="10dp">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:orientation="vertical"
+                                    android:padding="10dp">
+
+                                    <ImageView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="60dp"
+                                        android:layout_marginTop="5dp"
+                                        app:srcCompat="@drawable/policy" />
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:gravity="center"
+                                        android:text="@string/privacy_policy"
+                                        android:textColor="@color/txt_color"
+                                        android:textSize="18sp"
+                                        android:textStyle="bold" />
+
+                                    <TextView
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginTop="5dp"
+                                        android:gravity="center"
+                                        android:text="@string/app_policy_bn" />
+
+                                </LinearLayout>
+
+                            </androidx.cardview.widget.CardView>
+
                         </GridLayout>
 
                     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -253,6 +332,14 @@
         </LinearLayout>
 
     </androidx.core.widget.NestedScrollView>
+
+    <androidx.drawerlayout.widget.DrawerLayout
+        android:id="@+id/network_error"
+        android:visibility="invisible"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+        <include layout="@layout/activity_network_error"/>
+    </androidx.drawerlayout.widget.DrawerLayout>
 
 
     <com.google.android.gms.ads.AdView

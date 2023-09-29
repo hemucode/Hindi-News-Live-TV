@@ -3,9 +3,7 @@ package com.hemu.hindinewslivetv.services;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-
 import com.hemu.hindinewslivetv.models.Channel;
-
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;

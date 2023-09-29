@@ -2,19 +2,32 @@ package com.hemu.hindinewslivetv;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.os.Bundle;
+
+
+import androidx.drawerlayout.widget.DrawerLayout;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+
+import android.os.Handler;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 
@@ -23,15 +36,18 @@ import com.google.android.gms.ads.AdView;
 import com.google.android.gms.ads.MobileAds;
 import com.google.android.gms.ads.initialization.InitializationStatus;
 import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
+import com.hemu.hindinewslivetv.models.Common;
 import com.monstertechno.adblocker.AdBlockerWebView;
+import com.monstertechno.adblocker.util.AdBlocker;
+
+import java.util.Objects;
 
 public class WebActivity extends AppCompatActivity {
     WebView web;
+    public static final String TAG = "TAG";
     ProgressBar progressBar;
     private AdView adView;
     SwipeRefreshLayout mSwipeRefreshLayout;
-    boolean loadingFinished = true;
-    boolean redirect = false;
     LinearLayout linearLayout;
     Button button1,button2;
 
@@ -47,74 +63,63 @@ public class WebActivity extends AppCompatActivity {
 
         button2 = findViewById(R.id.button4);
 
-
-
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+        Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
 
         Bundle extras = getIntent().getExtras();
 
-        new AdBlockerWebView.init(this).initializeWebView(web);
         if (extras != null) {
+            progressBar.setVisibility(View.VISIBLE);
             String title = extras.getString("title");
             String url = extras.getString("url");
 
             getSupportActionBar().setTitle(title);
+            assert url != null;
             web.loadUrl(url);
 
-            button1.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Intent intent2 = new Intent("android.intent.action.VIEW");
-                    intent2.setData(Uri.parse(url));
-                    WebActivity.this.startActivity(intent2);
-                }
+            button1.setOnClickListener(v -> {
+                Intent intent2 = new Intent("android.intent.action.VIEW");
+                intent2.setData(Uri.parse(url));
+                WebActivity.this.startActivity(intent2);
             });
 
-            button2.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    onBackPressed();
-                }
-            });
+            button2.setOnClickListener(v -> onBackPressed());
 
+            new AdBlockerWebView.init(this).initializeWebView(web);
             web.getSettings().setJavaScriptEnabled(true);
             web.getSettings().setLoadWithOverviewMode(true);
             web.getSettings().setUseWideViewPort(true);
 
+            web.setWebChromeClient(new MyChrome());
             web.setWebViewClient(new WebViewClient() {
+                @Override
+                public boolean shouldOverrideUrlLoading(WebView view, String request) {
 
+                    return super.shouldOverrideUrlLoading(view, request);
+                }
+                @SuppressWarnings("deprecation")
+                @Override
+                public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+
+                    return AdBlockerWebView.blockAds(view,url) ? AdBlocker.createEmptyResource() :
+                            super.shouldInterceptRequest(view, url);
+
+                }
                 @Override
                 public void onReceivedError(WebView view, WebResourceRequest request, WebResourceError error) {
-                    web.setVisibility(View.INVISIBLE);
-                    linearLayout.setVisibility(View.VISIBLE);
-                }
-
-                @Override
-                public boolean shouldOverrideUrlLoading(WebView view, String urlNewString) {
-                    if (!loadingFinished) {
-                        redirect = true;
+                    if (!Common.isConnectToInternet(WebActivity.this)) {
+                        web.setVisibility(View.INVISIBLE);
+                        linearLayout.setVisibility(View.VISIBLE);
                     }
+                    super.onReceivedError(view, request, error);
 
-                    loadingFinished = false;
-                    view.loadUrl(urlNewString);
-                    return true;
                 }
-                @Override
-                public void onPageStarted(WebView view, String url, Bitmap favicon) {
-                    loadingFinished = false;
-                }
-
                 @Override
                 public void onPageFinished(WebView view, String url) {
-                    if (!redirect) {
-                        loadingFinished = true;
-                    }
-                    if (loadingFinished && !redirect) {
-                        progressBar.setVisibility(View.INVISIBLE);
-                    } else {
-                        redirect = false;
-                    }
+
+                    super.onPageFinished(view, url);
+                    progressBar.setVisibility(View.INVISIBLE);
                 }
+
             });
 
         }
@@ -123,26 +128,19 @@ public class WebActivity extends AppCompatActivity {
 
         mSwipeRefreshLayout = findViewById(R.id.refresh_app);
 
-        mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
-            @Override
-            public void onRefresh() {
-                mSwipeRefreshLayout.setRefreshing(false);
-                web.loadUrl("javascript:window.location.reload( true )");
-                loadFacebookAds();
-            }
+        mSwipeRefreshLayout.setOnRefreshListener(() -> {
+            mSwipeRefreshLayout.setRefreshing(false);
+            web.loadUrl("javascript:window.location.reload( true )");
+            loadFacebookAds();
         });
 
     }
-
 
     public void loadFacebookAds() {
         if (adView != null) {
             adView.destroy();
         }
-        MobileAds.initialize(this, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-            }
+        MobileAds.initialize(this, initializationStatus -> {
         });
 
         adView = findViewById(R.id.adView);
@@ -157,5 +155,60 @@ public class WebActivity extends AppCompatActivity {
             onBackPressed();
         }
         return super.onOptionsItemSelected(item);
+    }
+
+    private class MyChrome extends WebChromeClient {
+        private View mCustomView;
+        private WebChromeClient.CustomViewCallback mCustomViewCallback;
+        protected FrameLayout mFullscreenContainer;
+        private int mOriginalOrientation;
+        private int mOriginalSystemUiVisibility;
+
+        MyChrome() {}
+
+        public Bitmap getDefaultVideoPoster()
+        {
+            if (mCustomView == null) {
+                return null;
+            }
+            return BitmapFactory.decodeResource(getApplicationContext().getResources(), 2130837573);
+        }
+
+        public void onHideCustomView()
+        {
+            ((FrameLayout)getWindow().getDecorView()).removeView(this.mCustomView);
+            this.mCustomView = null;
+            getWindow().getDecorView().setSystemUiVisibility(this.mOriginalSystemUiVisibility);
+            setRequestedOrientation(this.mOriginalOrientation);
+            this.mCustomViewCallback.onCustomViewHidden();
+            this.mCustomViewCallback = null;
+        }
+
+        public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback)
+        {
+            if (this.mCustomView != null)
+            {
+                onHideCustomView();
+                return;
+            }
+            this.mCustomView = paramView;
+            this.mOriginalSystemUiVisibility = getWindow().getDecorView().getSystemUiVisibility();
+            this.mOriginalOrientation = getRequestedOrientation();
+            this.mCustomViewCallback = paramCustomViewCallback;
+            ((FrameLayout)getWindow().getDecorView()).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+            getWindow().getDecorView().setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+        }
+    }
+
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+        web.saveState(outState);
+    }
+
+    @Override
+    protected void onRestoreInstanceState(Bundle savedInstanceState) {
+        super.onRestoreInstanceState(savedInstanceState);
+        web.restoreState(savedInstanceState);
     }
 }

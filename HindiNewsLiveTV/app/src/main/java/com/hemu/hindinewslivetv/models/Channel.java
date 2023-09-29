@@ -1,4 +1,5 @@
 package com.hemu.hindinewslivetv.models;
+
 import java.io.Serializable;
 
 public class Channel implements Serializable {

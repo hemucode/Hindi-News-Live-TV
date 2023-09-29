@@ -1,5 +1,6 @@
 package com.hemu.hindinewslivetv.adopters;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
@@ -29,6 +30,7 @@ import com.hemu.hindinewslivetv.WebActivity;
 import com.hemu.hindinewslivetv.models.Channel;
 import com.hemu.hindinewslivetv.services.CacheImageManager;
 
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -53,10 +55,11 @@ public class ChannelAdopters extends RecyclerView.Adapter<ChannelAdopters.ViewHo
     @Override
     public ChannelAdopters.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View v;
-        if (type.equals("small_item")) {
-            v = LayoutInflater.from(mContext).inflate(R.layout.activity_item, parent, false);
-        }else {
+        if (type.equals("item")) {
             v = LayoutInflater.from(mContext).inflate(R.layout.activity_big_item, parent, false);
+
+        }else {
+            v = LayoutInflater.from(mContext).inflate(R.layout.activity_item, parent, false);
         }
         return new ViewHolder(v);
     }
@@ -94,22 +97,24 @@ public class ChannelAdopters extends RecyclerView.Adapter<ChannelAdopters.ViewHo
         }
 
         if (holder.yt!= null){
-            holder.yt.setText(ChannelDataItem.getYoutube());
+            String ytLink =  "https://www.youtube.com/channel/"+ ChannelDataItem.getYoutube();
+            holder.yt.setText(ytLink);
             holder.yt.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent linkOpen = new Intent(Intent.ACTION_VIEW, Uri.parse(ChannelDataItem.getYoutube()));
+                    Intent linkOpen = new Intent(Intent.ACTION_VIEW, Uri.parse(ytLink));
                     v.getContext().startActivity(linkOpen);
                 }
             });
         }
 
         if (holder.fb!= null){
-            holder.fb.setText(ChannelDataItem.getFacebook());
+            String fbLink  ="https://www.facebook.com/"+ChannelDataItem.getFacebook();
+            holder.fb.setText(fbLink);
             holder.fb.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    Intent linkOpen = new Intent(Intent.ACTION_VIEW, Uri.parse(ChannelDataItem.getFacebook()));
+                    Intent linkOpen = new Intent(Intent.ACTION_VIEW, Uri.parse(fbLink));
                     v.getContext().startActivity(linkOpen);
                 }
             });
@@ -194,7 +199,8 @@ public class ChannelAdopters extends RecyclerView.Adapter<ChannelAdopters.ViewHo
                 MyImageTask task = new MyImageTask();
                 task.setViewHolder(holder);
                 task.execute(ChannelDataItem);
-            } else {
+            }
+            else {
                 holder.imageView.setImageBitmap(bitmap);
             }
         } catch (Exception e) {

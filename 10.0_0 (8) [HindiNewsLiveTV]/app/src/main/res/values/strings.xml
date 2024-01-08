@@ -1,0 +1,92 @@
+<resources>
+    <string name="app_name">Hindi News Live TV</string>
+    <string name="short_name">समाचार</string>
+    <string name="App_ID">ca-app-pub-3494707665933635~7256702820</string>
+    <string name="InterstitialAd">ca-app-pub-3494707665933635/9963575453</string>
+    <string name="Banner_Ads_1">ca-app-pub-3494707665933635/9527890364</string>
+    <string name="Banner_Ads_2">ca-app-pub-3494707665933635/8566733300</string>
+    <string name="bengali_share">दोस्तों के साथ बांटें</string>
+    <string name="english_share">Invite friends</string>
+    <string name="bengali_rate">कृपया रेटिंग दें</string>
+    <string name="english_rate">5 Star rating</string>
+    <string name="live_news">Live News</string>
+    <string name="bengali_live">सजग समाचार</string>
+    <string name="news_paper_bn">समाचार - पत्र</string>
+    <string name="app_policy_bn">ऐप की जानकारी</string>
+    <string name="owner_of_news_bn">न्यूज़ चैनल का मालिक</string>
+    <string name="news_bn">हिंदी समाचार</string>
+    <string name="privacy_policy">Privacy Policy</string>
+    <string name="privacy_policy_url">https://sites.google.com/view/hindi-news-live-tv-policy/home</string>
+    <string name="facebook">FaceBook</string>
+    <string name="youtube">YouTube</string>
+    <string name="livetv_link">LiveTV Link</string>
+    <string name="website">Website</string>
+    <string name="channel_description">Channel Description</string>
+    <string name="email">Email</string>
+    <string name="live_now">Live Now</string>
+    <string name="ePaper_url">https://script.google.com/macros/s/AKfycbyLapFouImXmXcP_OkeLyXcV0Uq1_65w_CqNi529iPO9bmxogFZY2wPQlywIyz2Wvk/exec</string>
+    <string name="election_result">Election result</string>
+    <string name="election_ml">चुनाव परिणाम</string>
+    <string name="hi_shorts">लघु समाचार</string>
+    <string name="not_Open_ePaper">कुछ दिक्कत के कारण अखबार नहीं खुल रहा है. अपने ब्राउज़र में अखबार खोलें</string>
+    <string name="shorts">Shorts</string>
+    <string name="news_url">https://script.google.com/macros/s/AKfycbyvHOPsrSOXu9IwnldNbC_AGf46Vi653R-zZtvb3-C-Ej57-k6sKcytEtw_l4Oe7p4/exec</string>
+    <string name="rss_feed">https://hindi.news18.com/rss/khabar/nation/nation.xml</string>
+    <string name="election_ml_link">https://www.ndtv.com/elections</string>
+    <string name="description">Description</string>
+    <string name="new_s">पुनः प्रयास करें</string>
+    <string name="new_y">इसे लोड होने में कुछ समय लगेगा</string>
+    <string name="ok_n">पीछे</string>
+    <string name="share_it">इसे शेयर करें</string>
+    <string name="download_click">" - ऐप डाउनलोड करने के लिए नीचे दिए गए लिंक पर जाएं\n\n"</string>
+    <string name="back">Back</string>
+    <string name="reload">Reload</string>
+    <string name="forward">Forward</string>
+    <string name="channel_info">channel info</string>
+    <string name="short_categories">Short categories would you like to see?</string>
+    <string name="live_not">This channel is not live yet, if you want you can watch it live on YouTube</string>
+    <string name="more_read">More Read</string>
+    <string name="title">TITLE</string>
+    <string-array name="rssList">
+        <item>Choose a category…</item>
+        <item>OMG</item>
+        <item>देश</item>
+        <item>फुटबॉल</item>
+        <item>Cricket</item>
+        <item>मनोरंजन</item>
+        <item>States</item>
+        <item>बॉलीवुड</item>
+        <item>मोबाइल-टेक</item>
+        <item>Health</item>
+        <item>उत्तर प्रदेश</item>
+        <item>छत्तीसगढ़</item>
+        <item>मध्य प्रदेश</item>
+        <item>लाइफ़</item>
+        <item>हॉलीवुड</item>
+        <item>हरियाणा</item>
+
+
+    </string-array>
+
+    <string-array name="rssURL">
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/nation/nation.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/ajab-gajab.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/nation/nation.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/sports/football.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/sports/cricket.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/entertainment/entertainment.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/states.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/entertainment/bollywood.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/tech/tech.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/lifestyle/health.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/uttar-pradesh/uttar-pradesh.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/chhattisgarh/chhattisgarh.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/madhya-pradesh/madhya-pradesh.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/lifestyle/lifestyle.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/entertainment/hollywood.xml</item>
+        <item>https://hindi.news18.com/commonfeeds/v1/hin/rss/haryana/haryana.xml</item>
+
+
+    </string-array>
+
+</resources>
